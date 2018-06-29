@@ -1,0 +1,214 @@
+<!doctype html>
+<html >
+ <head>
+  <meta charset="UTF-8">
+  <meta http-equiv="x-ua-compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <script src="/js/jquery/2.0.0/jquery.min.js"></script>
+  <link href="/css/bootstrap/3.3.6/bootstrap.min.css" rel="stylesheet">
+  <script src="/js/bootstrap/3.3.6/bootstrap.min.js"></script>
+
+  
+  <title></title>
+  <style type="text/css">
+  	table thead tr th{
+		text-align:center;
+		}
+	#right{float:right};
+	</style>
+ </head>
+
+ <body background="/images/background.jpg">
+ 	<div class='container'>
+
+ 	<nav class="navbar navbar-default navbar navbar-inverse" role="navigation">
+  	<div class="container-fluid">
+    <div class="navbar-header">
+     	 <a class="navbar-brand" href="#">你的备忘录</a>
+    </div>
+   		 <ul class="nav navbar-nav navbar-right">
+   		 	<img src="/images/touxiang.jpg" class="img-circle" width='45' height='45'>
+      		<li><a href="http://127.0.0.1:8081/regist.html"><span class="glyphicon glyphicon-user"></span> 注册</a></li>
+      		<li><a href="http://127.0.0.1:8081/login.html"><span class="glyphicon glyphicon-log-in"></span> 注销</a></li>
+    	</ul>
+  	</div>
+	</nav>
+
+	<div id="app" style="padding:20px;">
+	<div class="panel panel-primary">
+		<div class="panel-heading">列表清单</div>
+			<div style="padding: 30px 100px 10px;">
+    			<form class="bs-example-form bs-example " role="form">
+       				<div class="input-group">
+		
+       					 <span class="input-group-addon">
+						🔍			
+						</span>
+        				<input type="text" class="form-control" placeholder="查询事项"   v-model='search'>
+        			</div>
+        		</form>
+			</div>	
+			<div class="panel-group"  >
+			<div class="panel panel-default">
+			<div class="panel-heading">
+				<h4 class="panel-title">
+					<a data-toggle="collapse" data-parent="#accordion" 
+				   	href="#collapseOne">
+						🏠待做列表
+					</a>
+						<div class="pull-right" >
+  							<a data-toggle="collapse" data-parent="#accordion" 
+				   				href="#collapseOne">
+				   				这里还有{{this.rows.length}}件事情
+				  			 </a><span class="caret"></span>
+						</div>	
+				</h4>
+			</div>
+			<div id="collapseOne" class="panel-collapse collapse in">
+				<div class="panel-body">
+					<table class="table table-bordered table-striped text-center">
+						<thead>
+							<tr>
+								<th>事件</th>
+								<th>截止日期</th>
+								<th>优先级</th>
+								<th>备注</th>
+								<th>操作</th>
+							</tr>
+						</thead>
+						<tbody>
+							<template v-for="row,index in searchData">
+								<tr>
+									<td >
+										<li class="dropdown">
+										<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+										 	<template v-if="row.sign==1"> <span class="glyphicon glyphicon-check"></span></template>
+										 	<template v-if="row.sign==2"> <span class="glyphicon glyphicon-time"></span>{{row.tname}}</template>
+										 	<template v-else>{{row.tname}}</template>
+										<b class="caret"></b>
+										</a>
+									<ul class="dropdown-menu">
+										<li><a href="#" @click='setcomp(index)'>标记已完成</a></li>
+										<li><a href="#" @click='delaysetcomp(index)'>标记为延期时间</a></li>
+										<li><a href="#" @click='Denycomp(index)'>取消已完成</a></li>
+										<li><a href="#" @click='NoDenycomp(index)'>取消延期</a></li>
+										<li><a href="#">复制</a></li>
+										<li class="divider"></li>
+								
+									</ul>
+										</li>
+            						</td>
+									<td>{{row.deadline}}</td>
+									<td>{{row.priority}}</td>
+									<td>{{row.tip}}</td>
+									<td>&nbsp&nbsp;<a href="#" @click="deleteMatter(index)">删除</a>
+									&nbsp&nbsp;<a href="#" @click="saveIntomydate(index)">放入"我的一天"</a>
+									</td>
+								</tr>
+							</template>
+								<tr>
+								<td><input type="text" class="form-control"  v-model="rowtemplate.tname"/ ></td>
+								<td><input type="date" class="form-control"  v-model="rowtemplate.deadline"/ ></td>
+								<td>
+									<select class="form-control" id="priority" v-model="rowtemplate.priority" >
+										<option>高</option>
+										<option>低</option>
+										<option>中</option>
+									</select>
+								</td>
+								<td><input type="text" class="form-control"  v-model="rowtemplate.tip"/ ></td>
+								<td><button type="bubtton" class="btn btn-primary" @click="save(index)" >
+								添加</button>
+								</td>
+								</tr>
+								</tbody>
+								</table>
+
+				
+						</div>
+					</div>
+				</div>
+		</div>
+		<div class="panel-group" id="accordion" >
+		<div class="panel panel-default">
+		<div class="panel-heading">
+			<h4 class="panel-title">
+				<a data-toggle="collapse" data-parent="#accordion" 
+				   href="#collapseTwo">
+					☀我的一天
+				</a>
+				<div class="pull-right" >
+						<a data-toggle="collapse" data-parent="#accordion" 
+				   		href="#collapseTwo">
+  						今天还有{{this.rowstoday.length}}件事情<span class="caret"></span>
+  						</a>
+				</div>	
+			</h4>
+		</div>
+		<div id="collapseTwo" class="panel-collapse collapse in">
+			<div class="panel-body">
+			<table class="table table-bordered table-striped text-center">
+				<thead>
+					<tr>
+						<th>事件</th>
+						<th>截止日期</th>
+						<th>优先级</th>
+						<th>备注</th>
+						<th>操作</th>
+					</tr>
+				</thead>
+				<tbody>
+							<template v-for="rowstodays,index in rowstoday">
+								<tr>
+									<td><li class="dropdown">
+										<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+											<template v-if="rowstodays.sign==1"> <span class="glyphicon glyphicon-check"></span></template>
+											<template v-if="rowstodays.sign==2"> <span class="glyphicon glyphicon-time"></span>{{rowstodays.tname}}</template>
+										 	<template v-else>{{rowstodays.tname}}</template>
+										<b class="caret"></b>
+										</a>
+									<ul class="dropdown-menu">
+										<li><a href="#" @click='setTodaycomp(index)'>标记已完成</a></li>
+										<li><a href="#" @click='delayTodaycomp(index)'>标记为延期时间</a></li>
+										<li><a href="#" @click='DenyTodaycomp(index)'>取消已完成</a></li>
+										<li><a href="#" @click='NoDenyTodaycomp(index)'>取消延期</a></li>
+										<li><a href="#">复制</a></li>
+										<li class="divider"></li>
+										
+									</ul>
+										</li>
+            						</td>
+									<td>{{rowstodays.deadline}}</td>
+									<td>{{rowstodays.priority}}</td>
+									<td>{{rowstodays.tip}}</td>
+									</td>
+									<td>
+										<a href="#" @click="deleteTodays(index)">删除</a>
+									</td>
+								</tr>
+							</template>
+						</tbody>
+
+			</table>
+
+				
+			</div>
+			</div>
+
+			</div>
+		</div>
+		</div>
+
+	</div>		
+	
+	</div>
+	</div>
+	</div>
+
+	</body>
+	<script src="/js/vue.js"></script>
+	<script src="/js/javascript.js"></script>
+	
+
+
+</html>
